@@ -1,0 +1,13 @@
+# Build Artifacts
+*.exe
+*.res
+*.pdb
+*.ilk
+*.obj
+
+# Inno Setup Output
+Output/
+
+# VS Code internals (Optional, keep tasks.json but ignore the rest)
+.vscode/*
+!.vscode/tasks.json
