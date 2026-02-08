@@ -2,7 +2,7 @@
 ; Modified for Calvindustries CopilotRemap.
 
 #define AppName "CopilotRemap"
-#define AppVer "1.0"
+#define AppVer "1.0.1"
 #define AppPub "Calvindustries"
 #define AppExe "CopilotRemap.exe"
 #define AppIco "CopilotRemap.ico"
@@ -13,13 +13,15 @@ AppName={#AppName}
 AppVerName={#AppName}
 AppVersion={#AppVer}
 AppPublisher={#AppPub}
-DefaultDirName={autopf}\{#AppPub}\{#AppName}
+DefaultDirName={code:GetDefaultDir}
+DisableDirPage=yes
 DefaultGroupName={#AppPub}\{#AppName}
 UninstallDisplayIcon={app}\{#AppIco}
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
 OutputBaseFilename=CopilotRemapInstaller
 SolidCompression=yes
 WizardStyle=modern
@@ -34,13 +36,20 @@ Source: ".\icon\{#AppIco}"; DestDir: "{app}"; Flags: ignoreversion
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExe}"; IconFilename: "{app}\{#AppIco}"
 
-[Run]
-Filename: "{sys}\schtasks.exe"; \
-    Parameters: "/Create /TN ""{#AppName}"" /TR ""'{app}\{#AppExe}'"" /SC ONLOGON /RL HIGHEST /F"; \
-    Flags: runhidden
+[Registry]
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
+    ValueType: string; ValueName: "{#AppName}"; \
+    ValueData: """{app}\{#AppExe}"""; Flags: uninsdeletevalue; \
+    Check: not IsAdminInstallMode
 
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
+    ValueType: string; ValueName: "{#AppName}"; \
+    ValueData: """{app}\{#AppExe}"""; Flags: uninsdeletevalue; \
+    Check: IsAdminInstallMode
+
+[Run]
 Filename: "{app}\{#AppExe}"; \
-    Description: "Enable CopilotRemap immediately"; \
+    Description: "Enable CopilotRemap now"; \
     Flags: postinstall nowait runhidden
     
 [UninstallRun]
@@ -48,6 +57,11 @@ Filename: "{sys}\taskkill.exe"; \
     Parameters: "/F /IM {#AppExe} /T"; \
     Flags: runhidden; RunOnceId: "StopCopilotApp"
 
-Filename: "{sys}\schtasks.exe"; \
-    Parameters: "/Delete /TN ""{#AppName}"" /F"; \
-    Flags: runhidden; RunOnceId: "RemoveCopilotTask"
+[Code]
+function GetDefaultDir(Param: string): string;
+begin
+  if IsAdminInstallMode then
+    Result := ExpandConstant('{autopf}\{#AppPub}\{#AppName}')
+  else
+    Result := ExpandConstant('{localappdata}\{#AppPub}\{#AppName}');
+end;
