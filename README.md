@@ -5,7 +5,7 @@
 A utility to remap the hardware Copilot key (Win + Left Shift + F23) to Right Control.
 
 ## Overview
-This program uses a low-level keyboard hook to intercept F23 signals and inject Right Control inputs. It is designed to run silently in the background via Task Scheduler.
+This program uses the windows keyboard hook to intercept F23 and inject Right Ctrl. It runs silently in the background as a service.
 
 * **Binary Size:** ~42KB
 * **Memory Usage:** ~500KB
@@ -15,13 +15,13 @@ This program uses a low-level keyboard hook to intercept F23 signals and inject 
 
 ### Installer
 Run the compiled Inno Setup installer `CopilotRemapInstaller.exe`. It will:
-1. Install the executable to Program Files.
-2. Create a Task Scheduler task to launch hidden at logon with high privileges.
-3. Start the process immediately.
+1. Install the executable to AppData/Program Files (for user only/for all users).
+2. Adds a registry entry to HKCU/KHLM (user/all).
+3. Start the process immediately (optional).
 
 ### Manual
 1. Download `CopilotRemap.exe`. Alternatively, compile it yourself.
-2. Create a task in Windows Task Scheduler set to "At log on" with "Highest privileges" targeting the executable.
+2. Configure for unassisted launch for executable using preferred method.
 
 ## Build Instructions
 
@@ -30,13 +30,13 @@ Run the compiled Inno Setup installer `CopilotRemapInstaller.exe`. It will:
 * Inno Setup (for the installer)
 
 ### Steps
-1. **Executable:** Build using the provided `.vscode/tasks.json`. It uses `/O1` and `/GS-` to minimize the binary footprint and skips standard CRT bloat via `/ENTRY:mainCRTStartup`.
-2. **Installer:** Compile `setup.iss` in Inno Setup. Ensure the icon is located in the `./icon/` directory.
+1. **Executable:** Build using the provided `.vscode/tasks.json`.
+2. **Installer:** Compile `setup.iss` in Inno Setup.
 
 ## Removal
-Uninstall via Windows Settings. The uninstaller terminates the process and deletes the scheduled task before removing files.
+Uninstall via Windows Settings. The uninstaller removes all files and registry entries.
 
-If you installed manually, uninstallation is as simple as deleting the task and executable.
+If you installed manually, uninstallation is as simple as deleting your autolaunch and the exe.
 
 ---
 Calvindustries
